@@ -1,0 +1,17 @@
+Ejemplo A, B:
+A
+B
+A AB
+B AB
+A2
+B2
+A A2
+B A2
+B B2
+A B2
+A A2B
+B A2B
+A2 AB
+B2 AB
+A AB2
+B AB2

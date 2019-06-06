@@ -5,11 +5,15 @@ class Data():
 	"""
 		Interpretar los datos experimentales de la base de datos
 	"""
-	datos = {}
 	ext = '.txt'
 	anterior = os.path.dirname(os.path.realpath(__file__))
-	def __init__(self, archivo):
-		data = self.Read('App/Datos/' + archivo + \
+	def __init__(self, archivo, kind=True):
+		self.datos = {}
+		if kind:
+			start = 'App/Datos/'
+		else:
+			start = 'Datos/'
+		data = self.Read(start + archivo + \
 			self.ext)
 		self.Process(data)
 
@@ -20,7 +24,10 @@ class Data():
 		for row in info.values:
 			cont = 0
 			for key in self.datos:
-				self.datos[key].append(float(row[cont].replace(',', '.')))
+				if isinstance(row[cont], str):
+					self.datos[key].append(float(row[cont].replace(',', '.')))
+				else:
+					self.datos[key].append(row[cont])
 				cont += 1
 
 	def Read(self, file):
@@ -31,4 +38,5 @@ class Data():
 		return self.datos
 
 if __name__ == '__main__':
-	Data('1')
+	D = Data('2', kind=False)()
+	print(D)
