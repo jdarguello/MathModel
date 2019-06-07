@@ -1,8 +1,62 @@
 Ejemplo A, B:
 A
 B
-A AB
-B AB
+AB
+A	B
+A 	AB
+B 	AB
+A	B	AB
+
+Ejemplo A, B y C:
+A
+B
+C
+AB
+AC
+BC
+ABC
+A	B
+A	C
+B	C
+A 	AB
+B 	AB
+C 	AB
+A 	AC
+B 	AC
+C 	AC
+A	BC
+B	BC
+C	BC
+A 	ABC
+B 	ABC
+C 	ABC
+A	B	C
+A	B	AB
+A	C	AB
+B	C	AB
+A	B	AC
+B	C	AC
+A	C	AC
+A	B	BC
+A	C	BC
+B	C	BC
+A	B	ABC
+A	C	ABC
+A	B	ABC
+A	AB	AC
+B	AB	AC
+C	AB	AC
+A	AB	BC
+B	AB	BC
+C	AB	BC
+A	AB	ABC
+B	AB	ABC
+C	AB	ABC
+AB	AC	BC
+AC	BC	ABC
+
+
+Ejemplo A, B, A2, B2
 A2
 B2
 A A2
