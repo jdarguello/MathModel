@@ -2,19 +2,24 @@ Ejemplo A, B:
 A
 B
 AB
+
 A	B
 A 	AB
 B 	AB
+
 A	B	AB
 
 Ejemplo A, B y C:
 A
 B
 C
+
 AB
 AC
 BC
+
 ABC
+
 A	B
 A	C
 B	C
@@ -54,6 +59,7 @@ B	AB	ABC
 C	AB	ABC
 AB	AC	BC
 AC	BC	ABC
+A	B	C	AB	AC	BC	ABC
 
 
 Ejemplo A, B, A2, B2

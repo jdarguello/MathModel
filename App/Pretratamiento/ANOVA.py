@@ -21,6 +21,9 @@ class NormalDist():
 		for key in self.NormG:
 			self.NormG[key]['Fracción'] = (self.NormG[key]['Orden']-0.5)/nT
 			self.NormG[key]['Z'] = norm.ppf(self.NormG[key]['Fracción'])
+		self.NormG['N_Datos'] = len(self.NormG[key]['Vector'])
+
+
 
 	def Orden(self):
 		datos = [[], []]
@@ -63,7 +66,7 @@ class NormalDist():
 				Encabezados.append(key)
 
 		for i in range(len(Encabezados)):
-			if i+1 < len(Encabezados):
+			if i < len(Encabezados):
 				comb.append(list(it.combinations(\
 					Encabezados, i+1)))
 
@@ -108,9 +111,10 @@ class NormalGraph(NormalDist):
 
 	def Axes(self):
 		for var in self.NormG:
-			self.Ejes['x'].append(self.NormG[var]['X'])
-			self.Ejes['Z'].append(self.NormG[var]['Z'])
-			self.Ejes['Nombres'].append(var)
+			if var != 'N_Datos':
+				self.Ejes['x'].append(self.NormG[var]['X'])
+				self.Ejes['Z'].append(self.NormG[var]['Z'])
+				self.Ejes['Nombres'].append(var)
 		
 
 	def __call__(self):
@@ -121,6 +125,7 @@ if __name__ == '__main__':
 		'A': [1,0,-1,1],
 		'B': [1,1,0,1],
 		'C': [1,1,0,-1],
+		'D': [0,0,0,0],
 		'Y': [1,1.5,2,2.5]
 	}
 	NormalGraph(data)
