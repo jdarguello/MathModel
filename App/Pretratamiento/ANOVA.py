@@ -23,8 +23,6 @@ class NormalDist():
 			self.NormG[key]['Z'] = norm.ppf(self.NormG[key]['Fracción'])
 		self.NormG['N_Datos'] = len(self.NormG[key]['Vector'])
 
-
-
 	def Orden(self):
 		datos = [[], []]
 		for var in self.NormG:
@@ -128,4 +126,4 @@ if __name__ == '__main__':
 		'D': [0,0,0,0],
 		'Y': [1,1.5,2,2.5]
 	}
-	NormalGraph(data)
+	print(NormalGraph(data)())
