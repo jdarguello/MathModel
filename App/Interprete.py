@@ -10,9 +10,9 @@ class Data():
 	def __init__(self, archivo, kind=True):
 		self.datos = {}
 		if kind:
-			start = 'App/Datos/'
+			start = 'App/Base de datos/Datos/'
 		else:
-			start = 'Datos/'
+			start = 'Base de datos/Datos/'
 		data = self.Read(start + archivo + \
 			self.ext)
 		self.Process(data)

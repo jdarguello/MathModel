@@ -33,6 +33,7 @@ class Planteamiento():
 			
 
 	def Calculos(self, Ecu, datos, NormDist):
+		#SE PUEDE ARREGLAR, ES SÓLO CAMBIAR for Ec in Ecu, adaptarlo al otro
 		cont = 1
 		for Ec in Ecu:
 			for Equation in Ec:
@@ -122,8 +123,6 @@ class Planteamiento():
 
 	def __call__(self):
 		return self.Planteamiento, self.Mejores
-
-
 
 def nCr(n,r):
     f = math.factorial
