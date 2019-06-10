@@ -111,17 +111,43 @@ class Modelo(varANDstr):
 	def Done(self):
 		self.db.close()
 
-	def Read(self):
+	def Read(self, num):
 		#Regeneración del diccionario
-		pass
+		try:
+			int(num)
+			info = self.Read_db(num)
+		except:
+			info = self.Read_db(num, False)
+		info = info[0]
 
-	def Read_db(self):
+		return {
+			info[0]: {
+				'Ecuación': self.TextLIST(info[1]),
+				'Variables': self.TextDIC(info[2]),
+				'Matriz exp': self.TextMATRIX(info[3]),
+				'Bs': self.TextLISTARRAY(info[4]),
+				'Ycal': self.TextLISTARRAY(info[5]),
+				'Yi-Ycal': self.TextLISTARRAY(info[6]),
+				'Yi-Yexpprom': self.TextLISTARRAY(info[7]),
+				'R2': info[8],
+				'R2aju': info[9]
+			}
+		}
+
+	def Read_db(self, num, number = True):
 		#Lectura de la base de datos
 		c = self.db.cursor()
 
-		c.execute("SELECT * FROM Modelos")
+		if number:
+			c.execute("SELECT * FROM Modelos WHERE num_eq = :num", 
+					{'num': num}
+				)
+		else:
+			c.execute("SELECT * FROM Modelos WHERE Eq = :num", 
+					{'num': self.ListTEXT(num)}
+				)
 
-		print(c.fetchall())
+		return c.fetchall()
 
 class DataBase():
 	"""
@@ -182,6 +208,6 @@ if __name__ == '__main__':
 	dic[1] = dic2
 
 	model = Modelo(dic= dic, nombre=name)
-	model.Create()
-	model.Read_db()
+	#model.Create()
+	print(model.Read(num=['A', 'AB']))
 	model.Done()

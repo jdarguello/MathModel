@@ -2,6 +2,9 @@ import numpy as np
 import itertools as it
 import math
 
+from App.DataBase.db import *
+
+
 class Planteamiento():
 	"""
 		Plantear la mayoría de los modelos matemáticos posibles.
