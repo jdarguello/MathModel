@@ -2,17 +2,23 @@ import numpy as np
 import itertools as it
 import math
 
-from App.DataBase.db import *
-
+#from App.DataBase.db import *
 
 class Planteamiento():
 	"""
 		Plantear la mayoría de los modelos matemáticos posibles.
 	"""
 
-	def __init__(self, datos, NormDist):
+	def __init__(self, datos, NormDist, nombre):
 		self.Planteamiento = {}
 		self.Mejores = {}
+		#Creación base de datos
+		"""
+		BD = DataBase(nombre)
+		BD.Create()
+		"""
+
+		#Llenado de la base de datos
 		Ecu = self.Combinaciones(datos, NormDist)
 		self.Calculos(Ecu, datos, NormDist)
 		self.Selection()
@@ -119,9 +125,11 @@ class Planteamiento():
 				combs.append(c)
 
 		Ecu = []
+		print(combs)
 		for i in range(Total_Var):
 			Ecu.append(list(it.combinations(\
 					combs, i+1)))
+			#print(Ecu)
 		return Ecu
 
 	def __call__(self):
@@ -504,4 +512,4 @@ if __name__ == '__main__':
 		  'Z': 0},
 		  'N_Datos':31}
 
-	Planteamiento(datos, NormDist)
+	Planteamiento(datos, NormDist, 'base')
