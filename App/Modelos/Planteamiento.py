@@ -2,7 +2,7 @@ import numpy as np
 import itertools as it
 import math
 
-#from App.DataBase.db import *
+from App.DataBase.db import *
 
 class Planteamiento():
 	"""
@@ -10,18 +10,16 @@ class Planteamiento():
 	"""
 
 	def __init__(self, datos, NormDist, nombre):
-		self.Planteamiento = {}
 		self.Mejores = {}
 		#Creación base de datos
-		"""
+		nombre = 'App/DataBase/' + nombre
 		BD = DataBase(nombre)
 		BD.Create()
-		"""
 
 		#Llenado de la base de datos
-		Ecu = self.Combinaciones(datos, NormDist)
-		self.Calculos(Ecu, datos, NormDist)
-		self.Selection()
+		self.Combinaciones(datos, NormDist, nombre)
+
+		#self.Selection()
 
 	def Selection(self):
 		Rmax = 0
@@ -41,61 +39,65 @@ class Planteamiento():
 				}
 			
 
-	def Calculos(self, Ecu, datos, NormDist):
-		#SE PUEDE ARREGLAR, ES SÓLO CAMBIAR for Ec in Ecu, adaptarlo al otro
-		cont = 1
-		for Ec in Ecu:
-			for Equation in Ec:
-				self.Planteamiento[cont] = {
-					'Ecuación':[],
-					'Variables': {}
-				}
-				M = []
-				onevec = []
-				for i in range(NormDist['N_Datos']):
-					onevec.append(1)
-				M.append(onevec)
-				for i in range(len(Equation)):
-					self.Planteamiento[cont]['Ecuación'].append(Equation[i])
-					self.Planteamiento[cont]['Variables'][Equation[i]] = \
-						NormDist[Equation[i]]['Vector']
-					M.append(NormDist[Equation[i]]['Vector'])
-				self.Planteamiento[cont]['Matriz exp'] = np.transpose(np.array(M))
-				self.Planteamiento[cont]['Bs'] = np.matmul(
-					np.matmul(
-						np.linalg.inv(np.matmul(
-							np.transpose(self.Planteamiento[cont]['Matriz exp']),
-							self.Planteamiento[cont]['Matriz exp']
-							)),
-						np.transpose(
-							self.Planteamiento[cont]['Matriz exp'])), 
-					np.transpose(datos['Y'])
-					)
-				self.Planteamiento[cont]['Ycal'] = np.matmul(
-					self.Planteamiento[cont]['Matriz exp'],
-					self.Planteamiento[cont]['Bs']
-					)
+	def Calculos(self, Ecu, datos, NormDist, nombre, cont):
+		try:
+			dic = {}
+			dic[cont] = {
+				'Ecuación':Ecu,
+				'Variables': {}
+			}
+			M = []
+			onevec = []
+			for i in range(NormDist['N_Datos']):
+				onevec.append(1)
+			M.append(onevec)
+			for i in range(len(Ecu)):
+				dic[cont]['Variables'][Ecu[i]] = \
+					NormDist[Ecu[i]]['Vector']
+				M.append(NormDist[Ecu[i]]['Vector'])
+			dic[cont]['Matriz exp'] = np.transpose(np.array(M))
+			dic[cont]['Bs'] = np.matmul(
+				np.matmul(
+					np.linalg.inv(np.matmul(
+						np.transpose(dic[cont]['Matriz exp']),
+						dic[cont]['Matriz exp']
+						)),
+					np.transpose(
+						dic[cont]['Matriz exp'])), 
+				np.transpose(datos['Y'])
+				)
+			dic[cont]['Ycal'] = np.matmul(
+				dic[cont]['Matriz exp'],
+				dic[cont]['Bs']
+				)
 
-				#Yi - Ycal, Yi - Yexpprom
-				self.Planteamiento[cont]['Yi-Ycal'] = np.zeros(NormDist['N_Datos'])
-				self.Planteamiento[cont]['Yi-Yexpprom'] = np.zeros(NormDist['N_Datos'])
-				for i in range(NormDist['N_Datos']):
-					self.Planteamiento[cont]['Yi-Ycal'][i] = \
-						datos['Y'][i] - self.Planteamiento[cont]['Ycal'][i]
-					self.Planteamiento[cont]['Yi-Yexpprom'][i] = \
-						datos['Y'][i] - np.mean(datos['Y'])
-				SSreg = np.sum(self.Planteamiento[cont]['Yi-Ycal']**2)
-				SStot = np.sum(self.Planteamiento[cont]['Yi-Yexpprom']**2)
-				self.Planteamiento[cont]['R2'] = (SStot-\
-						SSreg)/SStot
-				self.Planteamiento[cont]['R2aj'] = \
-					(SStot/(NormDist['N_Datos']-1)-\
-						SSreg/(NormDist['N_Datos']-\
-							len(self.Planteamiento[cont]['Ecuación'])-\
-							1))/(SStot/(NormDist['N_Datos']-1))
-				cont += 1
+			#Yi - Ycal, Yi - Yexpprom
+			dic[cont]['Yi-Ycal'] = np.zeros(NormDist['N_Datos'])
+			dic[cont]['Yi-Yexpprom'] = np.zeros(NormDist['N_Datos'])
+			for i in range(NormDist['N_Datos']):
+				dic[cont]['Yi-Ycal'][i] = \
+					datos['Y'][i] - dic[cont]['Ycal'][i]
+				dic[cont]['Yi-Yexpprom'][i] = \
+					datos['Y'][i] - np.mean(datos['Y'])
+			SSreg = np.sum(dic[cont]['Yi-Ycal']**2)
+			SStot = np.sum(dic[cont]['Yi-Yexpprom']**2)
+			dic[cont]['R2'] = (SStot-\
+					SSreg)/SStot
+			dic[cont]['R2aju'] = \
+				(SStot/(NormDist['N_Datos']-1)-\
+					SSreg/(NormDist['N_Datos']-\
+						len(dic[cont]['Ecuación'])-\
+						1))/(SStot/(NormDist['N_Datos']-1))
 
-	def Combinaciones(self, datos, NormDist):
+			self.Guardar(dic, nombre)
+		except:
+			pass
+
+	def Guardar(self, dic, nombre):
+		model = Modelo(nombre, dic)
+		model.Create()
+
+	def Combinaciones(self, datos, NormDist, nombre):
 		Encabezados = []
 		cant_var_ini = 0
 		for var in datos:
@@ -124,20 +126,32 @@ class Planteamiento():
 					c += letra[0]
 				combs.append(c)
 
-		Ecu = []
-		print(combs)
 		for i in range(Total_Var):
-			Ecu.append(list(it.combinations(\
-					combs, i+1)))
-			#print(Ecu)
-		return Ecu
+			self.combinations(combs, i+1, datos, NormDist, nombre)
+
+	def combinations(self, iterable, r, datos, NormDist, nombre):
+		pool = tuple(iterable)
+		n = len(pool)
+		if r > n:
+			return
+		indices = list(range(r))
+		cont = 1
+		while True:
+			Ec = list(pool[i] for i in indices)
+			self.Calculos(Ec, datos, NormDist, nombre, cont)
+			for i in reversed(range(r)):
+				if indices[i] != i + n - r:
+					break
+			else:
+				return
+			indices[i]  += 1
+			
+			for j in range(i+1, r):
+				indices[j] = indices[j-1] + 1
+			cont += 1
 
 	def __call__(self):
-		return self.Planteamiento, self.Mejores
-
-def nCr(n,r):
-    f = math.factorial
-    return f(n) // f(r) // f(n-r)
+		return self.Mejores
 
 if __name__ == '__main__':
 	datos = {'A': [-1.0,
