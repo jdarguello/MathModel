@@ -1,5 +1,6 @@
 import sqlite3
 import numpy as np
+import os
 
 class varANDstr():
 	"""
@@ -73,13 +74,20 @@ class Modelo(varANDstr):
 		self.nombre = nombre
 
 		self.db = sqlite3.connect(self.nombre + '.db')
+		self.c = self.db.cursor()
+
+		#Speed up
+		self.c.execute("PRAGMA synchronous = OFF")
+		self.c.execute("BEGIN TRANSACTION")
+
+		self.db.commit()
 
 	def Create(self):
 		for key in self.info:
 			pass
 		info = self.info[key]
-		c = self.db.cursor()
-		c.execute(
+		
+		self.c.execute(
 				"""INSERT INTO Modelos VALUES (
 					:key,
 					:Eq,
@@ -136,18 +144,20 @@ class Modelo(varANDstr):
 
 	def Read_db(self, num, number = True):
 		#Lectura de la base de datos
-		c = self.db.cursor()
+		self.c = self.db.cursor()
 
 		if number:
-			c.execute("SELECT * FROM Modelos WHERE num_eq = :num", 
+			self.c.execute("SELECT * FROM Modelos WHERE num_eq = :num", 
 					{'num': num}
 				)
 		else:
-			c.execute("SELECT * FROM Modelos WHERE Eq = :num", 
+			self.c.execute("SELECT * FROM Modelos WHERE Eq = :num", 
 					{'num': self.ListTEXT(num)}
 				)
 
-		return c.fetchall()
+		self.db.commit()
+
+		return self.c.fetchall()
 
 class DataBase():
 	"""
@@ -180,7 +190,7 @@ class DataBase():
 		db.close()
 
 	def Delete(self):
-		pass
+		os.remove(self.nombre)
 
 if __name__ == '__main__':
 	name = 'data'

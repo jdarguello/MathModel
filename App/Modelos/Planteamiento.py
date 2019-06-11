@@ -1,8 +1,10 @@
 import numpy as np
 import itertools as it
 import math
+import gc
 
-from App.DataBase.db import *
+
+#from App.DataBase.db import *
 
 class Planteamiento():
 	"""
@@ -11,10 +13,13 @@ class Planteamiento():
 
 	def __init__(self, datos, NormDist, nombre):
 		self.Mejores = {}
+		self.contador = 1
 		#Creación base de datos
+		"""
 		nombre = 'App/DataBase/' + nombre
 		BD = DataBase(nombre)
 		BD.Create()
+		"""
 
 		#Llenado de la base de datos
 		self.Combinaciones(datos, NormDist, nombre)
@@ -39,8 +44,9 @@ class Planteamiento():
 				}
 			
 
-	def Calculos(self, Ecu, datos, NormDist, nombre, cont):
+	def Calculos(self, Ecu, datos, NormDist, nombre):
 		try:
+			cont = self.contador
 			dic = {}
 			dic[cont] = {
 				'Ecuación':Ecu,
@@ -88,10 +94,10 @@ class Planteamiento():
 					SSreg/(NormDist['N_Datos']-\
 						len(dic[cont]['Ecuación'])-\
 						1))/(SStot/(NormDist['N_Datos']-1))
-
-			self.Guardar(dic, nombre)
+			#self.Guardar(dic, nombre)
+			self.contador += 1
 		except:
-			pass
+			print('ERROR')
 
 	def Guardar(self, dic, nombre):
 		model = Modelo(nombre, dic)
@@ -126,8 +132,18 @@ class Planteamiento():
 					c += letra[0]
 				combs.append(c)
 
+		Ecu_ant = []
 		for i in range(Total_Var):
-			self.combinations(combs, i+1, datos, NormDist, nombre)
+			"""
+			if len(Ecu_ant) < 100:
+				Ecu = list(it.combinations(combs, i+1))
+				for Ec in Ecu:
+
+			else:
+			"""
+			#self.combinations(combs, i+1, datos, NormDist, nombre)
+			Ecu = list(it.combinations(combs, i+1))
+			del Ecu
 
 	def combinations(self, iterable, r, datos, NormDist, nombre):
 		pool = tuple(iterable)
@@ -135,395 +151,34 @@ class Planteamiento():
 		if r > n:
 			return
 		indices = list(range(r))
-		cont = 1
 		while True:
 			Ec = list(pool[i] for i in indices)
-			self.Calculos(Ec, datos, NormDist, nombre, cont)
+			#self.Calculos(Ec, datos, NormDist, nombre)
+			#print(Ec)
+			del Ec
 			for i in reversed(range(r)):
 				if indices[i] != i + n - r:
 					break
 			else:
+				gc.collect()
 				return
 			indices[i]  += 1
 			
 			for j in range(i+1, r):
 				indices[j] = indices[j-1] + 1
-			cont += 1
+
 
 	def __call__(self):
 		return self.Mejores
 
 if __name__ == '__main__':
-	datos = {'A': [-1.0,
-	  1.0,
-	  -1.0,
-	  1.0,
-	  -1.0,
-	  1.0,
-	  -1.0,
-	  1.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  2.0,
-	  -2.0,
-	  0.0,
-	  0.0,
-	  1.5,
-	  -1.5,
-	  0.0,
-	  0.0,
-	  1.0,
-	  -1.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  1.0,
-	  -1.0,
-	  0.0,
-	  0.0],
-	 'B': [-1.0,
-	  -1.0,
-	  1.0,
-	  1.0,
-	  -1.0,
-	  -1.0,
-	  1.0,
-	  1.0,
-	  0.0,
-	  0.0,
-	  2.0,
-	  -2.0,
-	  0.0,
-	  0.0,
-	  1.5,
-	  -1.5,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  1.0,
-	  -1.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  1.0,
-	  -1.0],
-	 'C': [-1.0,
-	  -1.0,
-	  -1.0,
-	  -1.0,
-	  1.0,
-	  1.0,
-	  1.0,
-	  1.0,
-	  2.0,
-	  -2.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  1.5,
-	  -1.5,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  0.0,
-	  1.0,
-	  -1.0,
-	  1.0,
-	  -1.0],
-	 'Y': [6.073,
-	  2.447,
-	  1.559,
-	  5.745,
-	  7.799,
-	  3.667,
-	  3.863,
-	  8.201,
-	  5.777,
-	  0.832,
-	  3.267,
-	  2.705,
-	  14.853,
-	  9.35,
-	  3.129,
-	  2.973,
-	  8.642,
-	  6.511,
-	  4.689,
-	  1.418,
-	  9.135,
-	  0.016,
-	  3.164,
-	  2.341,
-	  3.15,
-	  2.789,
-	  3.234,
-	  6.313,
-	  4.354,
-	  3.671,
-	  0.125]}
-
-	NormDist = {'A': {'Vector': [-1.0,
-		   1.0,
-		   -1.0,
-		   1.0,
-		   -1.0,
-		   1.0,
-		   -1.0,
-		   1.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   2.0,
-		   -2.0,
-		   0.0,
-		   0.0,
-		   1.5,
-		   -1.5,
-		   0.0,
-		   0.0,
-		   1.0,
-		   -1.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   1.0,
-		   -1.0,
-		   0.0,
-		   0.0],
-		  'X': 3.2558124999999998,
-		  'Orden': 4,
-		  'Fracción': 0.5833333333333334,
-		  'Z': 0.21042839424792484},
-		 'B': {'Vector': [-1.0,
-		   -1.0,
-		   1.0,
-		   1.0,
-		   -1.0,
-		   -1.0,
-		   1.0,
-		   1.0,
-		   0.0,
-		   0.0,
-		   2.0,
-		   -2.0,
-		   0.0,
-		   0.0,
-		   1.5,
-		   -1.5,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   1.0,
-		   -1.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   1.0,
-		   -1.0],
-		  'X': 1.675625,
-		  'Orden': 2,
-		  'Fracción': 0.25,
-		  'Z': -0.6744897501960817},
-		 'C': {'Vector': [-1.0,
-		   -1.0,
-		   -1.0,
-		   -1.0,
-		   1.0,
-		   1.0,
-		   1.0,
-		   1.0,
-		   2.0,
-		   -2.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   1.5,
-		   -1.5,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   1.0,
-		   -1.0,
-		   1.0,
-		   -1.0],
-		  'X': 3.5009375,
-		  'Orden': 5,
-		  'Fracción': 0.75,
-		  'Z': 0.6744897501960817},
-		 'AB': {'Vector': [1.0,
-		   -1.0,
-		   -1.0,
-		   1.0,
-		   1.0,
-		   -1.0,
-		   -1.0,
-		   1.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   0.0,
-		   1.0,
-		   1.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0],
-		  'X': 3.179125,
-		  'Orden': 3,
-		  'Fracción': 0.4166666666666667,
-		  'Z': -0.2104283942479247},
-		 'AC': {'Vector': [1.0,
-		   -1.0,
-		   1.0,
-		   -1.0,
-		   -1.0,
-		   1.0,
-		   -1.0,
-		   1.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   1.0,
-		   1.0,
-		   0.0,
-		   -0.0],
-		  'X': 1.289125,
-		  'Orden': 1,
-		  'Fracción': 0.08333333333333333,
-		  'Z': -1.382994127100638},
-		 'BC': {'Vector': [1.0,
-		   1.0,
-		   -1.0,
-		   -1.0,
-		   -1.0,
-		   -1.0,
-		   1.0,
-		   1.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   -0.0,
-		   1.0,
-		   1.0],
-		  'X': 0.7012499999999999,
-		  'Orden': 0,
-		  'Fracción': -0.08333333333333333,
-		  'Z': 0},
-		 'ABC': {'Vector': [-1.0,
-		   1.0,
-		   1.0,
-		   -1.0,
-		   1.0,
-		   -1.0,
-		   -1.0,
-		   1.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   -0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0,
-		   0.0],
-		  'X': 0.08225000000000016,
-		  'Orden': 0,
-		  'Fracción': -0.07142857142857142,
-		  'Z': 0},
-		  'N_Datos':31}
-
+	datos = {
+		'A':[1,1,1],
+		'B': [0,0,0],
+		'C': [1,1,1],
+		'D': [0,0,0],
+		
+		
+	}
+	NormDist = {}
 	Planteamiento(datos, NormDist, 'base')
