@@ -4,7 +4,7 @@ import math
 import gc
 
 
-#from App.DataBase.db import *
+from App.DataBase.db import *
 
 class Planteamiento():
 	"""
@@ -15,16 +15,14 @@ class Planteamiento():
 		self.Mejores = {}
 		self.contador = 1
 		#Creación base de datos
-		"""
 		nombre = 'App/DataBase/' + nombre
 		BD = DataBase(nombre)
 		BD.Create()
-		"""
 
 		#Llenado de la base de datos
 		self.Combinaciones(datos, NormDist, nombre)
 
-		#self.Selection()
+		self.Selection()
 
 	def Selection(self):
 		Rmax = 0
@@ -94,7 +92,7 @@ class Planteamiento():
 					SSreg/(NormDist['N_Datos']-\
 						len(dic[cont]['Ecuación'])-\
 						1))/(SStot/(NormDist['N_Datos']-1))
-			#self.Guardar(dic, nombre)
+			self.Guardar(dic, nombre)
 			self.contador += 1
 		except:
 			print('ERROR')
@@ -141,8 +139,8 @@ class Planteamiento():
 
 			else:
 			"""
-			#self.combinations(combs, i+1, datos, NormDist, nombre)
-			Ecu = list(it.combinations(combs, i+1))
+			self.combinations(combs, i+1, datos, NormDist, nombre)
+			#Ecu = list(it.combinations(combs, i+1))
 			del Ecu
 
 	def combinations(self, iterable, r, datos, NormDist, nombre):
@@ -153,7 +151,7 @@ class Planteamiento():
 		indices = list(range(r))
 		while True:
 			Ec = list(pool[i] for i in indices)
-			#self.Calculos(Ec, datos, NormDist, nombre)
+			self.Calculos(Ec, datos, NormDist, nombre)
 			#print(Ec)
 			del Ec
 			for i in reversed(range(r)):
