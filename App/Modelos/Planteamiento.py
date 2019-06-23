@@ -130,7 +130,7 @@ class Planteamiento():
 					c += letra[0]
 				combs.append(c)
 
-		Ecu_ant = []
+		#Ecu_ant = []
 		for i in range(Total_Var):
 			"""
 			if len(Ecu_ant) < 100:
@@ -141,7 +141,7 @@ class Planteamiento():
 			"""
 			self.combinations(combs, i+1, datos, NormDist, nombre)
 			#Ecu = list(it.combinations(combs, i+1))
-			del Ecu
+			#del Ecu
 
 	def combinations(self, iterable, r, datos, NormDist, nombre):
 		pool = tuple(iterable)

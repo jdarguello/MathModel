@@ -2,10 +2,12 @@ import numpy as np
 import itertools as it
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+from matplotlib.ticker import PercentFormatter
 
 class NormalDist():
 	"""
-		Datos para la gráfica de distribución normal
+		Datos para la gráfica de distribución normal y 
+		diragram de pareto
 	"""
 	def __init__(self, data):
 		self.NormG = {}
@@ -79,6 +81,93 @@ class NormalDist():
 				self.NormG[c] = {}
 		return combs
 
+class Pareto(NormalDist):
+	"""
+		Diagrama de pareto:	Consiste de una gráfica de barras y una 
+							línea de tendencia porcentual.
+
+		Gráfica de barras:	Eje y -> sumaproducto **2 / 16
+							Eje x -> nombre de combinación
+
+		Línea de tendencia:	Eje y -> porcentaje acumulado
+							Eje x -> nombre de combinación
+
+	"""
+	def __init__(self, data, grid=False):
+		super().__init__(data)
+		resul_grafico = self.ProcesamientoDatos(data['Y'])
+		self.Diagrama(resul_grafico, grid)
+
+	def Diagrama(self, res, grid):
+		fig, ax = plt.subplots()
+		x = [comb[0] for comb in res['Bar']['Ordenado']]
+		y = [comb[1] for comb in res['Bar']['Ordenado']]
+		y2 = res['Per']['PorAc']
+		ax.bar(x, y, color='C0')
+		ax2 = ax.twinx()
+		ax2.plot(x, y2, color='C1', marker='D', ms=7)
+		ax2.yaxis.set_major_formatter(PercentFormatter())
+
+		ax.tick_params(axis='y', colors='C0')
+		ax2.tick_params(axis='y', colors='C1')
+
+		if grid:
+			ax.grid()
+
+		ax.set_title('Diagrama de pareto')
+
+		plt.show()
+
+
+	def ProcesamientoDatos(self, Y):
+		#Listas ordenadas de mayor a menor
+		res = {
+			'Bar': {
+				'Inicial':{
+					'SumP': [],
+					'Nombres': []
+				},
+				'Ordenado':[],
+				'Total': 0
+			},
+			'Per': {
+				'PorAc': [],
+				'Nombres':[]
+			}
+		}
+
+		#Diagrama de barras
+		for key in self.NormG:
+			try:
+				res['Bar']['Inicial']['SumP'].append((np.dot(
+						np.array(self.NormG[key]['Vector']),
+						np.array(Y)
+					)**2)/16)
+				res['Bar']['Inicial']['Nombres'].append(key)
+			except:
+				pass
+
+		dtype = [('Combination', 'U10'), ('Value', 'f4')]
+		lista = []
+		for i in range(len(res['Bar']['Inicial']['SumP'])):
+			lista.append((
+						res['Bar']['Inicial']['Nombres'][i],
+						res['Bar']['Inicial']['SumP'][i]
+						))
+			res['Bar']['Total'] += res['Bar']['Inicial']['SumP'][i]
+		res['Bar']['Ordenado'] = np.sort(np.array(
+				lista, dtype = dtype
+			), order='Value')[::-1]
+
+		#Línea de tendencia
+		por_ant = 0
+		for i in range(len(res['Bar']['Inicial']['SumP'])):
+			por = (res['Bar']['Ordenado'][i][1]/res['Bar']['Total'])*100 + por_ant
+			res['Per']['Nombres'].append(res['Bar']['Ordenado'][i][0])
+			res['Per']['PorAc'].append(por.round(3))
+			por_ant = por
+		return res
+
 class NormalGraph(NormalDist):
 	"""
 		Gráfica de distribución normal
@@ -123,7 +212,10 @@ if __name__ == '__main__':
 		'A': [1,0,-1,1],
 		'B': [1,1,0,1],
 		'C': [1,1,0,-1],
-		'D': [0,0,0,0],
-		'Y': [1,1.5,2,2.5]
+		'D': [1,1,1,1],
+		'Y': [5,3.5,2,2.5]
 	}
-	print(NormalGraph(data)())
+	Dist = NormalDist(data)
+	#print(Dist.NormG)
+
+	pareto = Pareto(data, True)

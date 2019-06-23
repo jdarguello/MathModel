@@ -27,6 +27,35 @@ class Est():
 		else:
 			print('NO hay réplicas en el centro del cubo experimental')
 
+		self.Filtrado(datos)
+
+	def Filtrado(self, datos):
+		"""
+			Filtración de datos para planteamiento y validación. 
+
+			Validación		Los datos NO presentes en la superficie del
+							cubo.
+
+			Planteamiento 	Datos presentes en la superficie del cubo.	
+		"""
+		self.Plant = {}
+		self.Val = {}
+
+		for key in datos:
+			self.Plant[key] = []
+			self.Val[key] = []
+		for i in range(len(datos['Y'])):
+			plant = True
+			for key in datos:
+				if key != 'Y':
+					if datos[key][i] != -1 and datos[key][i] != 0 and \
+							datos[key][i] != 1:
+						plant = False
+			for key in datos:
+				if plant:
+					self.Plant[key].append(datos[key][i])
+				else:
+					self.Val[key].append(datos[key][i])
 
 	def __call__(self):
 		return self.resultados

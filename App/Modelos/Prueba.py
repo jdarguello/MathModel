@@ -19,5 +19,13 @@ def combinations(iterable, r):
 			indices[j] = indices[j-1] + 1
 		cont += 1
 
+import numpy as np
+
 if __name__ == '__main__':
-	print(combinations(['A', 'B', 'C', 'AB', 'AC', 'BC', 'ABC'], 2))
+	#print(combinations(['A', 'B', 'C', 'AB', 'AC', 'BC', 'ABC'], 2))
+
+	x = np.array(
+		[('A', 7.5625), ('B', 1.890625)], 
+		dtype=[('comb', 'U10'), ('par', 'f4')])
+	print(tuple(('x',2)))
+	print(np.sort(x, order='par'))
