@@ -93,9 +93,9 @@ class Pareto(NormalDist):
 							Eje x -> nombre de combinación
 
 	"""
-	def __init__(self, data, grid=False):
+	def __init__(self, data, porcentaje, grid=False):
 		super().__init__(data)
-		resul_grafico = self.ProcesamientoDatos(data['Y'])
+		resul_grafico = self.ProcesamientoDatos(data['Y'], porcentaje)
 		self.Diagrama(resul_grafico, grid)
 
 	def Diagrama(self, res, grid):
@@ -115,11 +115,13 @@ class Pareto(NormalDist):
 			ax.grid()
 
 		ax.set_title('Diagrama de pareto')
+		ax.set_ylim([0, res['Bar']['Total']])
+		ax2.set_ylim([0, 100])
 
 		plt.show()
 
 
-	def ProcesamientoDatos(self, Y):
+	def ProcesamientoDatos(self, Y, porcentaje):
 		#Listas ordenadas de mayor a menor
 		res = {
 			'Bar': {
@@ -160,12 +162,16 @@ class Pareto(NormalDist):
 			), order='Value')[::-1]
 
 		#Línea de tendencia
+		self.ef = []	#Variables de mayor efecto
 		por_ant = 0
 		for i in range(len(res['Bar']['Inicial']['SumP'])):
 			por = (res['Bar']['Ordenado'][i][1]/res['Bar']['Total'])*100 + por_ant
 			res['Per']['Nombres'].append(res['Bar']['Ordenado'][i][0])
+			if por < porcentaje:
+				self.ef.append(res['Bar']['Ordenado'][i][0])
 			res['Per']['PorAc'].append(por.round(3))
 			por_ant = por
+		self.ef = tuple(self.ef)
 		return res
 
 class NormalGraph(NormalDist):
