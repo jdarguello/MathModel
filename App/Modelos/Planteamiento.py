@@ -6,7 +6,7 @@ import gc
 
 #from App.DataBase.db import *
 
-class Planteamiento():
+class ModelosIniciales():
 	"""
 		Plantear los modelos matemáticos iniciales y escoger
 		el de mayor efecto.
@@ -34,57 +34,61 @@ class Planteamiento():
 				Rmax = self.Mejores[key]['R2aju']
 				self.Mejor = self.Mejores[key]
 			
-	def Calculos(self, Ecu, datos, NormDist, nombre):
-		cont = self.contador
-		dic = {}
-		dic[cont] = {
+	def Calculos(self, Ecu, datos, NormDist, nombre, exponentes):
+		dic = {
 			'Ecuación':Ecu,
 			'Variables': {}
 		}
 		M = []
-		onevec = []
-		for i in range(NormDist['N_Datos']):
-			onevec.append(1)
-		M.append(onevec)
+		M.append(np.ones(NormDist['N_Datos']))
+		contador = 0
 		for i in range(len(Ecu)):
-			dic[cont]['Variables'][Ecu[i]] = \
-				NormDist[Ecu[i]]['Vector']
-			M.append(NormDist[Ecu[i]]['Vector'])
-		dic[cont]['Matriz exp'] = np.transpose(np.array(M))
-		dic[cont]['Bs'] = np.matmul(
+			dic['Variables'][Ecu[i]] = {}
+			subdic= {
+				'Exponentes': {},
+				'Vector': np.ones(NormDist['N_Datos'])
+			}
+			for Ec in Ecu[i]:
+				subdic['Exponentes'][Ec] = exponentes[contador]
+				for k in range(int(exponentes[contador])):
+					subdic['Vector'] *= NormDist[Ec]['Vector']
+				contador += 1
+			dic['Variables'][Ecu[i]] = subdic
+			M.append(dic['Variables'][Ecu[i]]['Vector'])
+		dic['Matriz exp'] = np.transpose(np.array(M))
+		dic['Bs'] = np.matmul(
 			np.matmul(
 				np.linalg.inv(np.matmul(
-					np.transpose(dic[cont]['Matriz exp']),
-					dic[cont]['Matriz exp']
+					np.transpose(dic['Matriz exp']),
+					dic['Matriz exp']
 					)),
 				np.transpose(
-					dic[cont]['Matriz exp'])), 
+					dic['Matriz exp'])), 
 			np.transpose(datos['Y'])
 			)
-		dic[cont]['Ycal'] = np.matmul(
-			dic[cont]['Matriz exp'],
-			dic[cont]['Bs']
+		dic['Ycal'] = np.matmul(
+			dic['Matriz exp'],
+			dic['Bs']
 			)
 		#Yi - Ycal, Yi - Yexpprom
-		dic[cont]['Yi-Ycal'] = np.zeros(NormDist['N_Datos'])
-		dic[cont]['Yi-Yexpprom'] = np.zeros(NormDist['N_Datos'])
+		dic['Yi-Ycal'] = np.zeros(NormDist['N_Datos'])
+		dic['Yi-Yexpprom'] = np.zeros(NormDist['N_Datos'])
 		for i in range(NormDist['N_Datos']):
-			dic[cont]['Yi-Ycal'][i] = \
-				datos['Y'][i] - dic[cont]['Ycal'][i]
-			dic[cont]['Yi-Yexpprom'][i] = \
+			dic['Yi-Ycal'][i] = \
+				datos['Y'][i] - dic['Ycal'][i]
+			dic['Yi-Yexpprom'][i] = \
 				datos['Y'][i] - np.mean(datos['Y'])
-		SSreg = np.sum(dic[cont]['Yi-Ycal']**2)
-		SStot = np.sum(dic[cont]['Yi-Yexpprom']**2)
-		dic[cont]['R2'] = (SStot-\
+		SSreg = np.sum(dic['Yi-Ycal']**2)
+		SStot = np.sum(dic['Yi-Yexpprom']**2)
+		dic['R2'] = (SStot-\
 				SSreg)/SStot
-		dic[cont]['R2aju'] = \
+		dic['R2aju'] = \
 			(SStot/(NormDist['N_Datos']-1)-\
 				SSreg/(NormDist['N_Datos']-\
-					len(dic[cont]['Ecuación'])-\
+					len(dic['Ecuación'])-\
 					1))/(SStot/(NormDist['N_Datos']-1))
 		#self.Guardar(dic, nombre)
-		self.contador += 1
-		self.Mejores[cont] = dic[cont]
+		return dic
 
 	def Guardar(self, dic, nombre):
 		model = Modelo(nombre, dic)
@@ -127,12 +131,18 @@ class Planteamiento():
 			Ecu = list(it.combinations(combs, i+1))
 			print(Ecu)
 		"""
-
+		cont = 1
 		for i in range(len(Efecto)):
 			Ecu = list(it.combinations(Efecto, i+1))
 			for Ec in Ecu:
-				self.Calculos(Ec, datos, NormDist, nombre)
-			#print(self.Mejores)
+				contador = 0
+				for i in range(len(Ec)):
+					for E in Ec[i]:
+						contador += 1
+				exponentes = np.ones(contador)
+				dic = self.Calculos(Ec, datos, NormDist, nombre, exponentes)
+				self.Mejores[cont] = dic
+				cont += 1
 
 	def combinations(self, iterable, r, datos, NormDist, nombre):
 		pool = tuple(iterable)
@@ -159,6 +169,19 @@ class Planteamiento():
 
 	def __call__(self):
 		return self.Mejores
+
+class ModeloFinal(ModelosIniciales):
+	"""
+		A partir del mejor modelo inicial, se desarrolla un proceso iterativo
+		que permita seleccionar los exponentes finales.
+	"""
+	def __init__(self, Ecuacion, NormDist):
+		self.Respuestas = {}
+		self.CombExp(Ecuacion, NormDist)
+
+	def CombExp(self, Ecuacion, NormDist):
+		pass
+
 
 if __name__ == '__main__':
 	datos = {
