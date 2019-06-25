@@ -34,7 +34,7 @@ class ModelosIniciales():
 				Rmax = self.Mejores[key]['R2aju']
 				self.Mejor = self.Mejores[key]
 			
-	def Calculos(self, Ecu, datos, NormDist, nombre, exponentes):
+	def Calculos(self, Ecu, Y, NormDist, nombre, exponentes):
 		dic = {
 			'Ecuación':Ecu,
 			'Variables': {}
@@ -64,7 +64,7 @@ class ModelosIniciales():
 					)),
 				np.transpose(
 					dic['Matriz exp'])), 
-			np.transpose(datos['Y'])
+			np.transpose(Y)
 			)
 		dic['Ycal'] = np.matmul(
 			dic['Matriz exp'],
@@ -75,9 +75,9 @@ class ModelosIniciales():
 		dic['Yi-Yexpprom'] = np.zeros(NormDist['N_Datos'])
 		for i in range(NormDist['N_Datos']):
 			dic['Yi-Ycal'][i] = \
-				datos['Y'][i] - dic['Ycal'][i]
+				Y[i] - dic['Ycal'][i]
 			dic['Yi-Yexpprom'][i] = \
-				datos['Y'][i] - np.mean(datos['Y'])
+				Y[i] - np.mean(Y)
 		SSreg = np.sum(dic['Yi-Ycal']**2)
 		SStot = np.sum(dic['Yi-Yexpprom']**2)
 		dic['R2'] = (SStot-\
@@ -140,7 +140,7 @@ class ModelosIniciales():
 					for E in Ec[i]:
 						contador += 1
 				exponentes = np.ones(contador)
-				dic = self.Calculos(Ec, datos, NormDist, nombre, exponentes)
+				dic = self.Calculos(Ec, datos['Y'], NormDist, nombre, exponentes)
 				self.Mejores[cont] = dic
 				cont += 1
 
@@ -175,13 +175,27 @@ class ModeloFinal(ModelosIniciales):
 		A partir del mejor modelo inicial, se desarrolla un proceso iterativo
 		que permita seleccionar los exponentes finales.
 	"""
-	def __init__(self, Ecuacion, NormDist):
+	def __init__(self, Ecuacion, NormDist, Y, maximo = 3):
 		self.Respuestas = {}
-		self.CombExp(Ecuacion, NormDist)
+		self.Ans = {}
+		self.CombExp(Ecuacion, NormDist, Y, maximo)
 
-	def CombExp(self, Ecuacion, NormDist):
-		pass
+	def CombExp(self, Ecuacion, NormDist, Y, maximo):
+		#Exponentes
+		contador = 0
+		for i in range(len(Ecuacion)):
+			for E in Ecuacion[i]:
+				contador += 1
+		exponentes = np.ones(contador)
 
+		#Ecuaciones
+		cont = 1
+		for i in range(contador):
+			for j in range(maximo):
+				exponentes[i] = j+1
+				self.Respuestas[cont] = self.Calculos(Ecuacion, Y, NormDist, '', \
+					exponentes)
+				cont += 1
 
 if __name__ == '__main__':
 	datos = {
@@ -193,3 +207,5 @@ if __name__ == '__main__':
 	Efecto = ('AB', 'C', 'B')
 	NormDist = {}
 	Planteamiento(datos, NormDist, Efecto, 'base')
+
+	exponentes = [1, 1, 1, 1]
