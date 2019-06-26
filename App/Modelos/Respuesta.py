@@ -16,9 +16,12 @@ class Models():
 			texto += ' + \\beta _{' + str(cont) + '}'
 			cont += 1
 			for E in Ec:
-				texto += E
-				if res['Variables'][Ec]['Exponentes'][E] != 1.0:
-					texto += '^{' + str(res['Variables'][Ec]['Exponentes'][E]) + '}'
+				try:
+					int(E)
+				except:
+					texto += E
+					if res['Variables'][Ec]['Exponentes'][E] != 1.0:
+						texto += '^{' + str(res['Variables'][Ec]['Exponentes'][E]) + '}'
 		texto += '\\rightarrow \\left[\\beta _{' + str(0) + '}'
 		cont = 1
 		for Ec in res['Ecuación']:
