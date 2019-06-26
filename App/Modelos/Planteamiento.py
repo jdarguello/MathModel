@@ -175,10 +175,11 @@ class ModeloFinal(ModelosIniciales):
 		A partir del mejor modelo inicial, se desarrolla un proceso iterativo
 		que permita seleccionar los exponentes finales.
 	"""
-	def __init__(self, Ecuacion, NormDist, Y, maximo = 3):
+	def __init__(self, Ecuacion, NormDist, Y = None, maximo = 3):
 		self.Respuestas = {}
 		self.Ans = {}
 		self.CombExp(Ecuacion, NormDist, Y, maximo)
+		#self.Selection()
 
 	def CombExp(self, Ecuacion, NormDist, Y, maximo):
 		#Exponentes
@@ -188,24 +189,234 @@ class ModeloFinal(ModelosIniciales):
 				contador += 1
 		exponentes = np.ones(contador)
 
+		comb = {}
+		for Ec in Ecuacion:
+			comb[Ec] = []
+			cont = np.ones(len(Ec))
+			ultimo = len(Ec)-1
+			while ultimo != -1:
+				var = ''
+				for i in range(len(Ec)):
+					if i == len(Ec)-1:
+						for j in range(maximo):
+							comb[Ec].append(var + Ec[i] + str(int(cont[i])))
+							cont[i] += 1
+						cont[i] = 1
+						var = ''
+						if cont[ultimo] == maximo or ultimo == len(Ec)-1:
+							ultimo -= 1
+						cont[ultimo] += 1
+						var = ''
+					else:
+						var += Ec[i] + str(int(cont[i]))	
+
+		#c = list(it.combinations(dic, len(Ec)))
+		print(comb)
+
 		#Ecuaciones
+		"""
 		cont = 1
-		for i in range(contador):
-			for j in range(maximo):
-				exponentes[i] = j+1
-				self.Respuestas[cont] = self.Calculos(Ecuacion, Y, NormDist, '', \
-					exponentes)
-				cont += 1
+		for Ec in Ecuacion:
+			if len(Ec) > 1:
+
+		combinaciones = list(it.combinations(comb, len(Ecuacion)))
+		for c in combinaciones:
+			self.Respuestas[cont] = self.Calculos(Ecuacion, Y, NormDist, '', \
+				exponentes)
+			cont += 1
+		"""
+
+	def Selection(self):
+		Rmax = 0
+		for key in self.Respuestas:
+			if self.Respuestas[key]['R2aju'] > Rmax:
+				self.Ans = self.Respuestas[key]
+				Rmax = self.Respuestas[key]['R2aju']
 
 if __name__ == '__main__':
-	datos = {
-		'A':[1,1,1],
-		'B': [0,0,0],
-		'C': [1,1,1],
-		'D': [0,0,0],
-	}
-	Efecto = ('AB', 'C', 'B')
-	NormDist = {}
-	Planteamiento(datos, NormDist, Efecto, 'base')
-
-	exponentes = [1, 1, 1, 1]
+	Eq = ('A','AB','C')
+	NormDist = {'A': {'Vector': [-1.0,
+	   1.0,
+	   -1.0,
+	   1.0,
+	   -1.0,
+	   1.0,
+	   -1.0,
+	   1.0,
+	   0.0,
+	   0.0,
+	   2.0,
+	   1.0,
+	   -1.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   1.0,
+	   -1.0,
+	   0.0,
+	   0.0],
+	  'X': 5.1937500000000005,
+	  'Orden': 6,
+	  'Fracción': 0.7857142857142857,
+	  'Z': 0.7916386077433746},
+	 'B': {'Vector': [-1.0,
+	   -1.0,
+	   1.0,
+	   1.0,
+	   -1.0,
+	   -1.0,
+	   1.0,
+	   1.0,
+	   0.0,
+	   2.0,
+	   0.0,
+	   1.0,
+	   -1.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   1.0,
+	   -1.0],
+	  'X': 2.322625,
+	  'Orden': 3,
+	  'Fracción': 0.35714285714285715,
+	  'Z': -0.36610635680056963},
+	 'C': {'Vector': [-1.0,
+	   -1.0,
+	   -1.0,
+	   -1.0,
+	   1.0,
+	   1.0,
+	   1.0,
+	   1.0,
+	   2.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   1.0,
+	   -1.0,
+	   1.0,
+	   -1.0],
+	  'X': 3.095625,
+	  'Orden': 4,
+	  'Fracción': 0.5,
+	  'Z': 0.0},
+	 'AB': {'Vector': [1.0,
+	   -1.0,
+	   -1.0,
+	   1.0,
+	   1.0,
+	   -1.0,
+	   -1.0,
+	   1.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   1.0,
+	   1.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   -0.0,
+	   0.0,
+	   -0.0],
+	  'X': 3.179125,
+	  'Orden': 5,
+	  'Fracción': 0.6428571428571429,
+	  'Z': 0.3661063568005698},
+	 'AC': {'Vector': [1.0,
+	   -1.0,
+	   1.0,
+	   -1.0,
+	   -1.0,
+	   1.0,
+	   -1.0,
+	   1.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   -0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   1.0,
+	   1.0,
+	   0.0,
+	   -0.0],
+	  'X': 1.289125,
+	  'Orden': 2,
+	  'Fracción': 0.21428571428571427,
+	  'Z': -0.7916386077433746},
+	 'BC': {'Vector': [1.0,
+	   1.0,
+	   -1.0,
+	   -1.0,
+	   -1.0,
+	   -1.0,
+	   1.0,
+	   1.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   -0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   -0.0,
+	   1.0,
+	   1.0],
+	  'X': 0.7012499999999999,
+	  'Orden': 1,
+	  'Fracción': 0.07142857142857142,
+	  'Z': -1.465233792685523},
+	 'ABC': {'Vector': [-1.0,
+	   1.0,
+	   1.0,
+	   -1.0,
+	   1.0,
+	   -1.0,
+	   -1.0,
+	   1.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0,
+	   0.0],
+	  'X': 0.08225000000000016,
+	  'Orden': 0,
+	  'Fracción': -0.07142857142857142,
+	  'Z': 0},
+	 'N_Datos': 22}
+ 	
+	ModeloFinal(Eq, NormDist)

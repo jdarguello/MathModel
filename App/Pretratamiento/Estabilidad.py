@@ -40,17 +40,21 @@ class Est():
 		"""
 		self.Plant = {}
 		self.Val = {}
-
+		Primera = {}
 		for key in datos:
 			self.Plant[key] = []
 			self.Val[key] = []
+			Primera[key] = True
 		for i in range(len(datos['Y'])):
 			plant = True
 			for key in datos:
 				if key != 'Y':
 					if datos[key][i] != -1 and datos[key][i] != 0 and \
 							datos[key][i] != 1:
-						plant = False
+						if not Primera[key]:
+							plant = False
+						else:
+							Primera[key] = False
 			for key in datos:
 				if plant:
 					self.Plant[key].append(datos[key][i])
