@@ -34,61 +34,68 @@ class ModelosIniciales():
 				Rmax = self.Mejores[key]['R2aju']
 				self.Mejor = self.Mejores[key]
 			
-	def Calculos(self, Ecu, Y, NormDist, nombre, exponentes):
-		dic = {
-			'Ecuación':Ecu,
-			'Variables': {}
-		}
-		M = []
-		M.append(np.ones(NormDist['N_Datos']))
-		contador = 0
-		for i in range(len(Ecu)):
-			dic['Variables'][Ecu[i]] = {}
-			subdic= {
-				'Exponentes': {},
-				'Vector': np.ones(NormDist['N_Datos'])
+	def Calculos(self, Ecu, Y, NormDist, nombre, exponentes, Ecc = False):
+		try:
+			dic = {
+				'Ecuación':Ecu,
+				'Variables': {}
 			}
-			for Ec in Ecu[i]:
-				subdic['Exponentes'][Ec] = exponentes[contador]
-				for k in range(int(exponentes[contador])):
-					subdic['Vector'] *= NormDist[Ec]['Vector']
-				contador += 1
-			dic['Variables'][Ecu[i]] = subdic
-			M.append(dic['Variables'][Ecu[i]]['Vector'])
-		dic['Matriz exp'] = np.transpose(np.array(M))
-		dic['Bs'] = np.matmul(
-			np.matmul(
-				np.linalg.inv(np.matmul(
-					np.transpose(dic['Matriz exp']),
-					dic['Matriz exp']
-					)),
-				np.transpose(
-					dic['Matriz exp'])), 
-			np.transpose(Y)
-			)
-		dic['Ycal'] = np.matmul(
-			dic['Matriz exp'],
-			dic['Bs']
-			)
-		#Yi - Ycal, Yi - Yexpprom
-		dic['Yi-Ycal'] = np.zeros(NormDist['N_Datos'])
-		dic['Yi-Yexpprom'] = np.zeros(NormDist['N_Datos'])
-		for i in range(NormDist['N_Datos']):
-			dic['Yi-Ycal'][i] = \
-				Y[i] - dic['Ycal'][i]
-			dic['Yi-Yexpprom'][i] = \
-				Y[i] - np.mean(Y)
-		SSreg = np.sum(dic['Yi-Ycal']**2)
-		SStot = np.sum(dic['Yi-Yexpprom']**2)
-		dic['R2'] = (SStot-\
-				SSreg)/SStot
-		dic['R2aju'] = \
-			(SStot/(NormDist['N_Datos']-1)-\
-				SSreg/(NormDist['N_Datos']-\
-					len(dic['Ecuación'])-\
-					1))/(SStot/(NormDist['N_Datos']-1))
-		#self.Guardar(dic, nombre)
-		return dic
+			M = []
+			M.append(np.ones(NormDist['N_Datos']))
+			contador = 0
+			for i in range(len(Ecu)):
+				dic['Variables'][Ecu[i]] = {}
+				subdic= {
+					'Exponentes': {},
+					'Vector': np.ones(NormDist['N_Datos'])
+				}
+				if Ecc:
+					Ecuu = Ecc[i]
+				else:
+					Ecuu = Ecu[i]
+				for Ec in Ecuu:
+					subdic['Exponentes'][Ec] = exponentes[contador]
+					for k in range(int(exponentes[contador])):
+						subdic['Vector'] *= NormDist[Ec]['Vector']
+					contador += 1
+				dic['Variables'][Ecu[i]] = subdic
+				M.append(dic['Variables'][Ecu[i]]['Vector'])
+			dic['Matriz exp'] = np.transpose(np.array(M))
+			dic['Bs'] = np.matmul(
+				np.matmul(
+					np.linalg.inv(np.matmul(
+						np.transpose(dic['Matriz exp']),
+						dic['Matriz exp']
+						)),
+					np.transpose(
+						dic['Matriz exp'])), 
+				np.transpose(Y)
+				)
+			dic['Ycal'] = np.matmul(
+				dic['Matriz exp'],
+				dic['Bs']
+				)
+			#Yi - Ycal, Yi - Yexpprom
+			dic['Yi-Ycal'] = np.zeros(NormDist['N_Datos'])
+			dic['Yi-Yexpprom'] = np.zeros(NormDist['N_Datos'])
+			for i in range(NormDist['N_Datos']):
+				dic['Yi-Ycal'][i] = \
+					Y[i] - dic['Ycal'][i]
+				dic['Yi-Yexpprom'][i] = \
+					Y[i] - np.mean(Y)
+			SSreg = np.sum(dic['Yi-Ycal']**2)
+			SStot = np.sum(dic['Yi-Yexpprom']**2)
+			dic['R2'] = (SStot-\
+					SSreg)/SStot
+			dic['R2aju'] = \
+				(SStot/(NormDist['N_Datos']-1)-\
+					SSreg/(NormDist['N_Datos']-\
+						len(dic['Ecuación'])-\
+						1))/(SStot/(NormDist['N_Datos']-1))
+			#self.Guardar(dic, nombre)
+			return dic
+		except:
+			pass
 
 	def Guardar(self, dic, nombre):
 		model = Modelo(nombre, dic)
@@ -175,13 +182,15 @@ class ModeloFinal(ModelosIniciales):
 		A partir del mejor modelo inicial, se desarrolla un proceso iterativo
 		que permita seleccionar los exponentes finales.
 	"""
-	def __init__(self, Ecuacion, NormDist, Y = None, maximo = 3):
+	def __init__(self, Ecuacion, NormDist, ref = 0.82, Y = None,\
+					 maximo = 3, db = 'db'):
 		self.Respuestas = {}
 		self.Ans = {}
-		self.CombExp(Ecuacion, NormDist, Y, maximo)
+		comb = self.CombExp(Ecuacion, maximo)
+		self.Solucion(comb, NormDist, Y, db, ref)
 		#self.Selection()
 
-	def CombExp(self, Ecuacion, NormDist, Y, maximo):
+	def CombExp(self, Ecuacion, maximo):
 		#Exponentes
 		contador = 0
 		for i in range(len(Ecuacion)):
@@ -189,9 +198,8 @@ class ModeloFinal(ModelosIniciales):
 				contador += 1
 		exponentes = np.ones(contador)
 
-		comb = {}
+		comb = []
 		for Ec in Ecuacion:
-			comb[Ec] = []
 			cont = np.ones(len(Ec))
 			ultimo = len(Ec)-1
 			while ultimo != -1:
@@ -199,7 +207,7 @@ class ModeloFinal(ModelosIniciales):
 				for i in range(len(Ec)):
 					if i == len(Ec)-1:
 						for j in range(maximo):
-							comb[Ec].append(var + Ec[i] + str(int(cont[i])))
+							comb.append(var + Ec[i] + str(int(cont[i])))
 							cont[i] += 1
 						cont[i] = 1
 						var = ''
@@ -208,23 +216,30 @@ class ModeloFinal(ModelosIniciales):
 						cont[ultimo] += 1
 						var = ''
 					else:
-						var += Ec[i] + str(int(cont[i]))	
+						var += Ec[i] + str(int(cont[i]))
+		return comb
 
-		#c = list(it.combinations(dic, len(Ec)))
-		print(comb)
-
-		#Ecuaciones
-		"""
-		cont = 1
-		for Ec in Ecuacion:
-			if len(Ec) > 1:
-
-		combinaciones = list(it.combinations(comb, len(Ecuacion)))
-		for c in combinaciones:
-			self.Respuestas[cont] = self.Calculos(Ecuacion, Y, NormDist, '', \
-				exponentes)
-			cont += 1
-		"""
+	def Solucion(self, Exp, NormDist, Y, nombre, ref):
+		for i in range(len(Exp)):
+			Ecu = list(it.combinations(Exp, i+1))
+			for i in range(len(Ecu)):
+				exponentes = []
+				Ec = []
+				for j in range(len(Ecu[i])):
+					val = ''
+					for k in range(len(Ecu[i][j])):
+						try:
+							exponentes.append(int(Ecu[i][j][k]))
+						except:
+							if k <= len(Ecu[i][j])-2:
+								val += Ecu[i][j][k]
+					Ec.append(val)
+				Ans = self.Calculos(Ecu[i], Y, NormDist, nombre, exponentes, Ec)
+				try:
+					if Ans['R2aju'] > ref:
+						self.Ans = Ans
+				except:	
+					pass
 
 	def Selection(self):
 		Rmax = 0
