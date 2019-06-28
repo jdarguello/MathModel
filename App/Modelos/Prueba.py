@@ -1,33 +1,23 @@
 import numpy as np
-import IPython.display as IP
+from mpl_toolkits.mplot3d import Axes3D  
+# Axes3D import has side effects, it enables using projection='3d' in add_subplot
+import matplotlib.pyplot as plt
+import random
 
-def combinations(iterable, r):
-	pool = tuple(iterable)
-	n = len(pool)
-	if r > n:
-		return
-	indices = list(range(r))
-	cont = 1
-	while True:
-		Ec = list(pool[i] for i in indices)
-		print(Ec, cont)
-		for i in reversed(range(r)):
-			if indices[i] != i + n - r:
-				break
-		else:
-			return
-		indices[i]  += 1
-		
-		for j in range(i+1, r):
-			indices[j] = indices[j-1] + 1
-		cont += 1
+def fun(x, y):
+    return x**2 + y
 
-if __name__ == '__main__':
-	#print(combinations(['A', 'B', 'C', 'AB', 'AC', 'BC', 'ABC'], 2))
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+x = y = c = np.arange(-3.0, 3.0, 0.05)
+X, Y, C = np.meshgrid(x, y, c)
+zs = np.array(fun(np.ravel(X), np.ravel(Y)))
+Z = zs.reshape(X.shape)
+print(X)
+ax.plot_surface(X, Y, Z)
 
-	x = np.array([1,1,1])
-	y = np.array([0,2,0])
-	z = [i for i in range(len(x))]
-	
-	x = 'hola'
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
 
+plt.show()
