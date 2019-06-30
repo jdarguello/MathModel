@@ -56,7 +56,7 @@ class AleatoriedadY(ModelosIniciales):
 		Modelo['RMSEP'] = (Modelo['suma_cua_val_residuo']/(len(Y_real)-len(Ecu)))**(1/2)
 		Modelo['SSRES'] = Modelo['suma_cua_val_residuo'] + Modelo['suma_cua_calc_residuo']
 		Modelo['Error_Exp'] = 0
-		Modelo['LOF'] = Modelo[]
+		Modelo['LOF'] = 0
 
 	def Valid(self, Modelo):
 		pass

@@ -87,11 +87,14 @@ class ModelosIniciales():
 			SStot = np.sum(dic['Yi-Yexpprom']**2)
 			dic['R2'] = (SStot-\
 					SSreg)/SStot
-			dic['R2aju'] = \
-				(SStot/(NormDist['N_Datos']-1)-\
-					SSreg/(NormDist['N_Datos']-\
-						len(dic['Ecuación'])-\
-						1))/(SStot/(NormDist['N_Datos']-1))
+			if NormDist['N_Datos']-	len(dic['Ecuación'])-1 != 0:
+				dic['R2aju'] = \
+					(SStot/(NormDist['N_Datos']-1)-\
+						SSreg/(NormDist['N_Datos']-\
+							len(dic['Ecuación'])-\
+							1))/(SStot/(NormDist['N_Datos']-1))
+			else:
+				dic['R2aju'] = 0
 			#self.Guardar(dic, nombre)
 			return dic
 		except:
@@ -102,42 +105,6 @@ class ModelosIniciales():
 		model.Create()
 
 	def Combinaciones(self, datos, Efecto, NormDist, nombre):
-		"""
-		Encabezados = []
-		cant_var_ini = 0
-		for var in datos:
-			if var != "Y":
-				cant_var_ini += 1
-				Encabezados.append(var)
-
-		combinaciones = []
-		for i in range(len(Encabezados)):
-			if i < len(Encabezados):
-				combinaciones.append(list(it.combinations(\
-					Encabezados, i+1)))
-		print(combinaciones)
-
-		Total_Var = 0
-		for comb in combinaciones:
-			for comb2 in comb:
-				Total_Var += 1
-
-		#Pretratamiento
-		comb = combinaciones
-		combs = []
-		for combinaciones in comb:
-			for combinacion in combinaciones:
-				c = ''
-				for letra in combinacion:
-					c += letra[0]
-				combs.append(c)
-
-		#Ecu_ant = []
-		for i in range(Total_Var):
-			#self.combinations(combs, i+1, datos, NormDist, nombre)
-			Ecu = list(it.combinations(combs, i+1))
-			print(Ecu)
-		"""
 		cont = 1
 		for i in range(len(Efecto)):
 			Ecu = list(it.combinations(Efecto, i+1))
