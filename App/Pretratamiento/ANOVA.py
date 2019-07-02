@@ -7,7 +7,7 @@ from matplotlib.ticker import PercentFormatter
 class NormalDist():
 	"""
 		Datos para la gráfica de distribución normal y 
-		diragram de pareto
+		diragrama de pareto
 	"""
 	def __init__(self, data):
 		self.NormG = {}
@@ -93,13 +93,15 @@ class Pareto(NormalDist):
 							Eje x -> nombre de combinación
 
 	"""
-	def __init__(self, data, porcentaje, grid=False):
+	def __init__(self, data, porcentaje, grid=False, size = False):
 		super().__init__(data)
 		resul_grafico = self.ProcesamientoDatos(data['Y'], porcentaje)
-		self.Diagrama(resul_grafico, grid)
+		self.Diagrama(resul_grafico, grid, size)
 
-	def Diagrama(self, res, grid):
+	def Diagrama(self, res, grid, size):
 		fig, ax = plt.subplots()
+		if size:
+			fig.set_size_inches(size[0], size[1])
 		x = [comb[0] for comb in res['Bar']['Ordenado']]
 		y = [comb[1] for comb in res['Bar']['Ordenado']]
 		y2 = res['Per']['PorAc']
@@ -178,7 +180,7 @@ class NormalGraph(NormalDist):
 	"""
 		Gráfica de distribución normal
 	"""
-	def __init__(self, data):
+	def __init__(self, data, size=False):
 		self.Ejes = {
 			'x':[],
 			'Z':[],
@@ -187,6 +189,8 @@ class NormalGraph(NormalDist):
 		super().__init__(data)
 		self.fig = plt.figure()
 		self.ax = self.fig.add_subplot(111)
+		if size:
+			self.fig.set_size_inches(size[0], size[1])
 
 		self.Axes()
 

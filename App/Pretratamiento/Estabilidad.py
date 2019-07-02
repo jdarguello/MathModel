@@ -21,7 +21,7 @@ class Est():
 			self.resultados['Desvest'] = np.std(data000)
 			self.resultados['CV [%]'] = \
 				100*np.std(data000)/np.mean(data000)
-			self.resultados['Varianza'] = np.var(data000)
+			self.resultados['Varianza'] = np.var(data000, ddof=1)
 			if self.resultados['CV [%]'] > 10:
 				print("ADVERTENCIA: El coeficiente de variación (CV) está por encima del 10%")
 		else:
