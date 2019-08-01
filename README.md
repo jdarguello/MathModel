@@ -34,6 +34,11 @@ Si tienes Python:
  > `cd <dirección>`
 2. Abre Jupyter:
  > `jupyter notebook`
+ 
+Si tienes Anaconda:
+1. Abre Anaconda.
+2. Abre Jupyter notebook o Jupyter lab.
+
 3. Ejecuta los scripts en el siguiente orden:
  * Presentation.
  * data.
