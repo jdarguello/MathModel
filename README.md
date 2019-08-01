@@ -22,5 +22,3 @@ Capaz de resolver sistemas matriciales de 5 variables o más.
   * Windows 10.
   * MacOS "Mojave".
   * Ubuntu 18.04.
-
-
