@@ -22,3 +22,19 @@ Capaz de resolver sistemas matriciales de 5 variables o más.
   * Windows 10.
   * MacOS "Mojave".
   * Ubuntu 18.04.
+
+## Prerrequisitos
+Debes tener Python 3.5+ o Anaconda instalado en tu pc con Jupyter (notebook o lab).
+
+## Instalación
+Para usar el software, clona y pégalo en cualquier dirección de interés. 
+
+Si tienes Python:
+1. Abre la consola (WINDOWS + R - cmd) y accede a la dirección de la carpeta.
+ > `cd <dirección>`
+2. Abre Jupyter:
+ > `jupyter notebook`
+3. Ejecuta los scripts en el siguiente orden:
+ * Presentation.
+ * data.
+ * 
