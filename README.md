@@ -37,4 +37,5 @@ Si tienes Python:
 3. Ejecuta los scripts en el siguiente orden:
  * Presentation.
  * data.
- * 
+ * Planteamiento.
+ * Validation.
