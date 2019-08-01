@@ -23,5 +23,4 @@ Capaz de resolver sistemas matriciales de 5 variables o más.
   * MacOS "Mojave".
   * Ubuntu 18.04.
 
-## Instalación
-Para usar el software, sólo debes clonar este repositorio y pegarlo en la dirección de interés.
+
