@@ -7,12 +7,12 @@ class Data():
 	"""
 	ext = '.txt'
 	anterior = os.path.dirname(os.path.realpath(__file__))
-	def __init__(self, archivo, kind=True):
+	def __init__(self, directory, archivo, kind=True):
 		self.datos = {}
 		if kind:
-			start = 'App/Database/Datos/'
+			start = directory + '\App\Database\Data\\'
 		else:
-			start = 'Database/Datos/'
+			start = 'Database/Data/'
 		data = self.Read(start + archivo + \
 			self.ext)
 		self.Process(data)
