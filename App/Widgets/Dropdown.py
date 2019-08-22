@@ -28,3 +28,6 @@ class Down():
 	def __init__(self, options = ['English', 'Spanish'], value = 'English'):
 		self.Drop = Droppy(options, value=value)
 		display(self.Drop.widget)
+
+	def value(self):
+		return self.Drop()
