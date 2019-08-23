@@ -2,8 +2,20 @@ from inspect import getsourcefile
 import os.path
 
 class Ref():
-	def __init__(self, language):
+	langs = ['Spanish', 'English']
+	def __init__(self):
 		raw_path = os.path.abspath(getsourcefile(lambda:0))
+		#define language
+		language = ''
+		word = ''
+		for l in raw_path:
+			word += l
+			if l == '\\':
+				for lang in self.langs:
+					if word[:-1] == lang:
+						language = word[:-1]
+				word = ''
+		self.lang = language
 		# Cleaning of path
 		current_path = ''
 		add = ''
@@ -18,4 +30,7 @@ class Ref():
 		#parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
 
 	def __call__(self):
-		return self.current_dir
+		return self.current_dir, self.lang
+    
+if __name__ == '__main__':
+    Ref()
