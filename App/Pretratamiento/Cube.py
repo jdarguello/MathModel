@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+import matplotlib.patches as pt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 
@@ -16,7 +18,11 @@ class ExpCube():
                   [1, -1, 1 ],
                   [1, 1, 1],
                   [-1, 1, 1]])
-	def __init__(self, data):
+	points2D = np.array([[-1,-1],
+				[1,-1],
+				[1,1],
+				[-1,1]])
+	def __init__(self, data, lang = 'Spanish'):
 		num = 0
 		datos = []
 		for key in data:
@@ -27,15 +33,37 @@ class ExpCube():
 		if num == 1:
 			print('1D...')
 		elif num == 2:
-			self.D2(datos)
+			self.D2(datos, lang, data)
 		elif num == 3:
-			self.D3(datos)
+			self.D3(datos, lang, data)
 		else:
-			print('Bigger than 3D')
-	def D2(self, data):
-		pass
+			if lang == 'English':
+				print('Bigger than 3D')
+			else:
+				print('Mayor a 3D')
+	def D2(self, data, lang, original):
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
 
-	def D3(self, data):
+		col = pt.Polygon(self.points2D, linewidth=1, edgecolor='b', alpha=.25)
+		ax.add_patch(col)
+		ax.scatter(data[0], data[1])
+		primera = [True, True]
+		for label in original:
+			if label != 'Y':
+				if primera[0]:
+					ax.set_xlabel(label)
+					primera[0] = False
+				elif primera[1]:
+					ax.set_ylabel(label)
+					primera[1] = False
+		if lang == 'Spanish':
+			ax.set_title('Cubo Experimental')
+		else:
+			ax.set_title('Experimental Cube')
+		plt.show()
+
+	def D3(self, data, lang, original):
 		fig = plt.figure()
 		ax = fig.gca(projection='3d')
 		
@@ -56,17 +84,28 @@ class ExpCube():
 		col.set_facecolor(face_color)
 		ax.add_collection3d(col)
 		ax.scatter3D(data[0], data[1], data[2])
-
-		ax.set_xlabel('X')
-		ax.set_ylabel('Y')
-		ax.set_zlabel('Z')
+		primera = [True, True, True]
+		for label in original:
+			if label != 'Y':
+				if primera[0]:
+					ax.set_xlabel(label)
+					primera[0] = False
+				elif primera[1]:
+					ax.set_ylabel(label)
+					primera[1] = False
+				elif primera[2]:
+					ax.set_zlabel(label)
+					primera[2] = False
+		if lang == 'English':
+			ax.set_title('Experimental Cube')
+		else:
+			ax.set_title('Cubo Experimental')
 		plt.show()	
 		
 if __name__ == '__main__':
 	datos = {
 		'A': [1,0,2,1.5],
 		'B': [0,0,1,2],
-		'C': [1,1,0,1],
 		'Y': [0,0,0,0]
 	}
 	ExpCube(datos)
