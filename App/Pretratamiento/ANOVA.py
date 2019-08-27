@@ -116,7 +116,7 @@ class Pareto(NormalDist):
 		if grid:
 			ax.grid()
 
-		ax.set_title('Diagrama de pareto')
+		fig.suptitle('Pareto Chart')
 		ax.set_ylim([0, res['Bar']['Total']])
 		ax2.set_ylim([0, 100])
 
@@ -201,7 +201,7 @@ class NormalGraph(NormalDist):
 
 		self.ax.set_xlabel('Data')
 		self.ax.set_ylabel('Z')
-		self.ax.set_title('Gráfica de Distribución Normal')
+		self.ax.set_title('Normal Distribution Graph')
 		self.ax.grid()
 
 		#print(np.sort(self.Ejes['x']), np.sort(self.Ejes['Z']))
