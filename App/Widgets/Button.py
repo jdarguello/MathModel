@@ -1,12 +1,13 @@
 import ipywidgets as widgets
 import subprocess
-
-class Button():
-	def __init__(self, name='Data Selection'):
-		button = widgets.Button(description='Data Selection')
-		out = widgets.Output()
-		button.on_click(self.on_button_clicked)
-		widgets.VBox([button, out])
-	def on_button_clicked(self, b):
-	    with out:
-	        subprocess.run("jupyter lab Languages/" + lang.value() + "/data.ipynb")
+button = widgets.Button(description='Data Selection')
+out = widgets.Output()
+def on_button_clicked(b):
+    with out:
+        language = lang.value()
+        try:
+            subprocess.run("jupyter lab Languages/" + language + "/data.ipynb")
+        except:
+            subprocess.run("jupyter lab 'Languages/" + language + "/data.ipynb'")
+button.on_click(on_button_clicked)
+widgets.VBox([button, out])
