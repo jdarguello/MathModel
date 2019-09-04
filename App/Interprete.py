@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import sys
 
 class Data():
 	"""
@@ -8,13 +9,19 @@ class Data():
 	ext = '.txt'
 	anterior = os.path.dirname(os.path.realpath(__file__))
 	def __init__(self, directory, archivo, kind=True):
+		sys.path.insert(0, directory)
 		self.datos = {}
 		if kind:
-			start = directory + '\App\Database\Data\\'
+			start = directory + '\App\DataBase\Data\\'
 		else:
-			start = 'Database/Data/'
-		data = self.Read(start + archivo + \
-			self.ext)
+			start = '/DataBase/Data/'
+		try:
+			data = self.Read(start + archivo + \
+				self.ext)
+		except:
+			start = directory + '/App/DataBase/Data/'
+			data = self.Read(start + archivo + \
+				self.ext)
 		self.Process(data)
 
 	def Process(self, info):
@@ -38,5 +45,6 @@ class Data():
 		return self.datos
 
 if __name__ == '__main__':
-	D = Data('2', kind=False)()
+	current = '/home/jdarguello/Escritorio/Maestría/MathModel'
+	D = Data(current, '2')()
 	print(D)

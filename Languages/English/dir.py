@@ -10,7 +10,7 @@ class Ref():
 		word = ''
 		for l in raw_path:
 			word += l
-			if l == '\\':
+			if l == '\\'or l == '/':
 				for lang in self.langs:
 					if word[:-1] == lang:
 						language = word[:-1]
@@ -23,7 +23,7 @@ class Ref():
 		    add += l
 		    if add[:-1] == language or add[:-1] == 'Languages':
 		        add = ''
-		    elif l == '\\':
+		    elif l == '\\' or l == '/':
 		        current_path += add
 		        add = ''
 		self.current_dir = os.path.dirname(current_path)
@@ -34,3 +34,4 @@ class Ref():
     
 if __name__ == '__main__':
     Ref()
+    print(Ref()())

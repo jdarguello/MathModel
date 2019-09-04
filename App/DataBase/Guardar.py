@@ -5,8 +5,8 @@ class Save():
 	"""
 		Guarda la información en un archivo .csv
 	"""
-	def __init__(self, Modelo, ValData, Y, filename):
-		self.ruta = 'App/DataBase/Resultados/'
+	def __init__(self, current_dir, Modelo, ValData, Y, filename):
+		self.ruta = current_dir + '/App/DataBase/Resultados/'
 		self.CrearDic(filename)
 		self.Guarda(Modelo, ValData, Y, filename)
 
