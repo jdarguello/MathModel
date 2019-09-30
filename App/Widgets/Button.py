@@ -11,3 +11,19 @@ def on_button_clicked(b):
             subprocess.run("jupyter lab 'Languages/" + language + "/data.ipynb'")
 button.on_click(on_button_clicked)
 widgets.VBox([button, out])
+
+class A:
+	def __init__(self):
+		print("hola, soy A")
+
+class B:
+	def __init__(self):
+		print("hola, soy B")
+
+class C(A,B):
+	def __init__(self):
+		print("C?")
+		super().__init__()
+		super(A, self).__init__()
+
+C()
